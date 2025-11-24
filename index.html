@@ -1,0 +1,1858 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Egg💕</title>
+        
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+        <style>
+            :root {
+                --color-white: rgba(255, 255, 255, 1);
+                --color-black: rgba(0, 0, 0, 1);
+                --color-cream-50: rgba(252, 252, 249, 1);
+                --color-cream-100: rgba(255, 255, 253, 1);
+                --color-gray-200: rgba(245, 245, 245, 1);
+                --color-gray-300: rgba(167, 169, 169, 1);
+                --color-gray-400: rgba(119, 124, 124, 1);
+                --color-slate-500: rgba(98, 108, 113, 1);
+                --color-brown-600: rgba(94, 82, 64, 1);
+                --color-charcoal-700: rgba(31, 33, 33, 1);
+                --color-charcoal-800: rgba(38, 40, 40, 1);
+                --color-slate-900: rgba(19, 52, 59, 1);
+                --color-teal-300: rgba(50, 184, 198, 1);
+                --color-teal-400: rgba(45, 166, 178, 1);
+                --color-teal-500: rgba(33, 128, 141, 1);
+                --color-teal-600: rgba(29, 116, 128, 1);
+                --color-teal-700: rgba(26, 104, 115, 1);
+                --color-teal-800: rgba(41, 150, 161, 1);
+                --color-red-400: rgba(255, 84, 89, 1);
+                --color-red-500: rgba(192, 21, 47, 1);
+                --color-orange-400: rgba(230, 129, 97, 1);
+                --color-orange-500: rgba(168, 75, 47, 1);
+                --color-brown-600-rgb: 94, 82, 64;
+                --color-teal-500-rgb: 33, 128, 141;
+                --color-slate-900-rgb: 19, 52, 59;
+                --color-slate-500-rgb: 98, 108, 113;
+                --color-red-500-rgb: 192, 21, 47;
+                --color-red-400-rgb: 255, 84, 89;
+                --color-orange-500-rgb: 168, 75, 47;
+                --color-orange-400-rgb: 230, 129, 97;
+                --color-background: var(--color-cream-50);
+                --color-surface: var(--color-cream-100);
+                --color-text: var(--color-slate-900);
+                --color-text-secondary: var(--color-slate-500);
+                --color-primary: var(--color-teal-500);
+                --color-primary-hover: var(--color-teal-600);
+                --color-primary-active: var(--color-teal-700);
+                --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                --font-size-base: 14px;
+                --font-size-lg: 16px;
+                --font-size-xl: 18px;
+                --font-size-2xl: 20px;
+                --font-size-3xl: 24px;
+                --font-size-4xl: 30px;
+                --font-weight-normal: 400;
+                --font-weight-medium: 500;
+                --font-weight-semibold: 550;
+                --font-weight-bold: 600;
+                --space-8: 8px;
+                --space-12: 12px;
+                --space-16: 16px;
+                --space-20: 20px;
+                --space-24: 24px;
+                --space-32: 32px;
+                --radius-base: 8px;
+                --radius-lg: 12px;
+                --radius-full: 9999px;
+                --duration-fast: 150ms;
+                --duration-normal: 250ms;
+                --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @font-face {
+                font-family: 'FKGroteskNeue';
+                src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Georgia', 'Playfair Display', serif;
+                background: radial-gradient(circle at top, #ffe6f7 0%, #fdf5ff 40%, #fefefe 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                overflow-x: hidden;
+                color: #3d3d3d;
+                position: relative;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255, 111, 168, 0.05) 1px, transparent 1px);
+                background-size: 50px 50px;
+                animation: subtleMove 30s linear infinite;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            @keyframes subtleMove {
+                0% {
+                    transform: translate(0, 0);
+                }
+                100% {
+                    transform: translate(50px, 50px);
+                }
+            }
+
+            .page {
+                display: none;
+                width: 100%;
+                min-height: 100vh;
+                padding: 32px 24px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .page.active {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Main Page Styles */
+            #mainPage {
+                text-align: center;
+                transition: filter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Removed heavy blur and pointer-events:none so the UI remains interactive
+            after cracking the egg. Kept the class present for any future styling. */
+            #mainPage.blurred {
+                filter: none;
+            }
+
+            .egg-container {
+                position: relative;
+                margin: 40px auto;
+                animation: gentleFloat 3s ease-in-out infinite;
+            }
+
+            @keyframes gentleFloat {
+                0%, 100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: 0.7;
+                    transform: scale(1.02);
+                }
+            }
+
+            .egg {
+                width: 220px;
+                height: 286px;
+                background: linear-gradient(135deg, #ffe6f7 0%, #ffd4f0 50%, #ffcceb 100%);
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                position: relative;
+                cursor: pointer;
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 15px 45px rgba(255, 111, 168, 0.25), 0 8px 20px rgba(255, 179, 107, 0.15), inset 0 -30px 50px rgba(255, 192, 203, 0.3);
+                border: 4px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .egg:hover {
+                transform: scale(1.08) rotate(3deg) translateY(-5px);
+                box-shadow: 0 20px 60px rgba(255, 111, 168, 0.35), 0 10px 25px rgba(255, 179, 107, 0.2), inset 0 -30px 50px rgba(255, 192, 203, 0.4);
+            }
+
+            .egg.cracking {
+                animation: shake 0.5s;
+            }
+
+            @keyframes shake {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-10deg); }
+                75% { transform: rotate(10deg); }
+            }
+
+            .egg.cracked {
+                opacity: 0;
+                transform: scale(0.5);
+                transition: all 0.5s var(--ease-standard);
+            }
+
+            .egg-face {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .egg-eyes {
+                display: flex;
+                gap: 30px;
+                margin-bottom: 20px;
+            }
+
+            .egg-eye {
+                width: 20px;
+                height: 20px;
+                background: var(--color-slate-900);
+                border-radius: 50%;
+                animation: blink 3s infinite;
+            }
+
+            @keyframes blink {
+                0%, 96%, 100% { height: 20px; }
+                98% { height: 2px; }
+            }
+
+            .egg-smile {
+                width: 50px;
+                height: 25px;
+                border: 3px solid var(--color-slate-900);
+                border-top: none;
+                border-radius: 0 0 50px 50px;
+                margin: 0 auto;
+            }
+
+            .crack-lines {
+                display: none;
+            }
+
+            .egg.cracking .crack-lines {
+                display: block;
+            }
+
+            .crack {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.3);
+                height: 2px;
+            }
+
+            .crack1 {
+                width: 80px;
+                top: 40%;
+                left: 30%;
+                transform: rotate(-30deg);
+            }
+
+            .crack2 {
+                width: 60px;
+                top: 50%;
+                left: 40%;
+                transform: rotate(20deg);
+            }
+
+            .crack3 {
+                width: 70px;
+                top: 60%;
+                left: 25%;
+                transform: rotate(-10deg);
+            }
+
+            /* Hamburger Menu Button */
+            .hamburger-menu {
+                display: none;
+                position: fixed;
+                top: 24px;
+                right: 24px;
+                z-index: 1001;
+                background: linear-gradient(135deg, #ff6fa8 0%, #ffb36b 100%);
+                border: none;
+                border-radius: 12px;
+                padding: 12px;
+                cursor: pointer;
+                box-shadow: 0 6px 20px rgba(255, 111, 168, 0.4);
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .hamburger-menu.show {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                align-items: center;
+                justify-content: center;
+                width: 50px;
+                height: 50px;
+            }
+
+            .hamburger-menu:hover {
+                transform: scale(1.1);
+                box-shadow: 0 8px 25px rgba(255, 111, 168, 0.5);
+            }
+
+            .hamburger-line {
+                width: 28px;
+                height: 3px;
+                background: white;
+                border-radius: 3px;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .hamburger-menu.active .hamburger-line:nth-child(1) {
+                transform: rotate(45deg) translateY(8px);
+            }
+
+            .hamburger-menu.active .hamburger-line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger-menu.active .hamburger-line:nth-child(3) {
+                transform: rotate(-45deg) translateY(-8px);
+            }
+
+            /* Sidebar Overlay */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+                opacity: 0;
+                transition: opacity 0.3s var(--ease-standard);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+
+            /* Choices Container - Sidebar */
+            /* Choices - Inline panel (replaces sidebar) */
+            .choices-inline {
+                display: none;
+                position: fixed;
+                top: 56px;
+                left: 50%;
+                transform: translateX(-50%) scale(0.98);
+                width: calc(100% - 48px);
+                max-width: 720px;
+                background: rgba(255, 255, 255, 0.98);
+                z-index: 1001;
+                padding: 20px 22px;
+                overflow: visible;
+                box-shadow: 0 18px 50px rgba(255, 111, 168, 0.12), 0 8px 24px rgba(0,0,0,0.06);
+                border-radius: 20px;
+                border: 2px solid rgba(255, 255, 255, 0.95);
+                box-sizing: border-box;
+                transition: transform 0.28s var(--ease-standard), opacity 0.2s ease;
+                opacity: 0;
+                pointer-events: auto;
+            }
+
+            .choices-inline.show {
+                display: block;
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+
+            @media (min-width: 768px) {
+                .choices-inline {
+                    padding: 32px 36px;
+                    top: 72px;
+                }
+            }
+
+            .greeting-pop {
+                display: block;
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #ff6fa8;
+                text-align: center;
+                margin: 0 0 16px 0;
+                text-shadow: 3px 5px 12px rgba(255, 111, 168, 0.3);
+                letter-spacing: -0.5px;
+            }
+
+            @media (min-width: 768px) {
+                .greeting-pop {
+                    font-size: 2.8rem;
+                }
+            }
+
+            .greeting-pop.show {
+                animation: popBounce 0.8s var(--ease-standard);
+            }
+
+            @keyframes popBounce {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.2) rotate(-5deg);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1.2) rotate(2deg);
+                }
+                65% {
+                    transform: scale(0.9) rotate(-1deg);
+                }
+                80% {
+                    transform: scale(1.1) rotate(0deg);
+                }
+                100% {
+                    transform: scale(1) rotate(0deg);
+                }
+            }
+
+            .subtitle-fade {
+                display: block;
+                font-size: 1rem;
+                color: #7a7a7a;
+                text-align: center;
+                margin-bottom: 24px;
+                line-height: 1.7;
+                font-weight: 400;
+            }
+
+            @media (min-width: 768px) {
+                .subtitle-fade {
+                    font-size: 1.2rem;
+                    margin-bottom: 32px;
+                }
+            }
+
+            .subtitle-fade.show {
+                animation: gentleFadeIn 1s var(--ease-standard) 0.4s both;
+            }
+
+            @keyframes gentleFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                margin-top: 24px;
+                align-items: center;
+                max-width: 550px;
+                width: 100%;
+            }
+
+            @media (min-width: 768px) {
+                .buttons {
+                    gap: 16px;
+                    margin-top: 32px;
+                }
+            }
+
+            .buttons.show {
+                /* Already displayed via parent */
+            }
+
+            .buttons .btn {
+                animation: staggerFadeIn 0.5s var(--ease-standard) both;
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .buttons .btn:nth-child(1) { animation-delay: 0.6s; }
+            .buttons .btn:nth-child(2) { animation-delay: 0.7s; }
+            .buttons .btn:nth-child(3) { animation-delay: 0.8s; }
+            .buttons .btn:nth-child(4) { animation-delay: 0.9s; }
+            .buttons .btn:nth-child(5) { animation-delay: 1s; }
+            .buttons .btn:nth-child(6) { animation-delay: 1.1s; }
+
+            @keyframes staggerFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+
+
+            .btn {
+                padding: 16px 28px;
+                font-size: 1rem;
+                font-weight: 600;
+                background: linear-gradient(135deg, #ff6fa8 0%, #ffb36b 100%);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 6px 20px rgba(255, 111, 168, 0.4), 0 3px 10px rgba(255, 179, 107, 0.2);
+                font-family: 'Georgia', serif;
+                position: relative;
+                overflow: hidden;
+                touch-action: manipulation;
+            }
+
+            @media (min-width: 768px) {
+                .btn {
+                    padding: 18px 36px;
+                    font-size: 1.05rem;
+                }
+            }
+
+            .btn:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 10px 30px rgba(255, 111, 168, 0.5), 0 5px 15px rgba(255, 179, 107, 0.3);
+                background: linear-gradient(135deg, #ff5b99 0%, #ffa55a 100%);
+            }
+
+            .btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn:hover::before {
+                left: 100%;
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+            .title {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #ff6fa8;
+                margin-bottom: 24px;
+                text-shadow: 2px 4px 8px rgba(255, 111, 168, 0.2);
+                letter-spacing: -0.5px;
+                line-height: 1.2;
+            }
+
+            .subtitle {
+                font-size: 1.15rem;
+                color: #7a7a7a;
+                margin-bottom: 24px;
+                line-height: 1.7;
+                font-weight: 400;
+            }
+
+            /* Adventure Page Styles */
+            #adventurePage {
+                text-align: center;
+            }
+
+            .game-container {
+                background: rgba(255, 255, 255, 0.95);
+                padding: 40px;
+                border-radius: 24px;
+                box-shadow: 0 15px 50px rgba(255, 111, 168, 0.2), 0 8px 25px rgba(0, 0, 0, 0.08);
+                max-width: 550px;
+                width: 100%;
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .game-egg {
+                width: 170px;
+                height: 221px;
+                background: linear-gradient(135deg, #ffe6f7 0%, #ffd4f0 50%, #ffcceb 100%);
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                position: relative;
+                margin: 32px auto;
+                box-shadow: 0 12px 35px rgba(255, 111, 168, 0.25), 0 6px 15px rgba(255, 179, 107, 0.15);
+                border: 4px solid rgba(255, 255, 255, 0.8);
+                cursor: pointer;
+                transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .game-egg:hover {
+                transform: scale(1.1) rotate(3deg);
+                box-shadow: 0 15px 45px rgba(255, 111, 168, 0.35), 0 8px 20px rgba(255, 179, 107, 0.2);
+            }
+
+            .game-egg:active {
+                transform: scale(0.95);
+            }
+
+            .game-egg-face {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .game-egg-eyes {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 15px;
+            }
+
+            .game-egg-eye {
+                width: 15px;
+                height: 15px;
+                background: var(--color-slate-900);
+                border-radius: 50%;
+            }
+
+            .game-egg-smile {
+                width: 40px;
+                height: 20px;
+                border: 2px solid var(--color-slate-900);
+                border-top: none;
+                border-radius: 0 0 40px 40px;
+                margin: 0 auto;
+            }
+
+            .love-meter {
+                margin: 28px 0;
+            }
+
+            .love-meter-label {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #3d3d3d;
+                margin-bottom: 12px;
+                font-family: 'Georgia', serif;
+            }
+
+            .love-meter-bar {
+                width: 100%;
+                height: 35px;
+                background: rgba(255, 230, 247, 0.6);
+                border-radius: 50px;
+                overflow: hidden;
+                position: relative;
+                border: 2px solid rgba(255, 111, 168, 0.2);
+                box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+            }
+
+            .love-meter-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #ff6fa8 0%, #ffb36b 100%);
+                border-radius: 50px;
+                transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                padding-right: 16px;
+                color: white;
+                font-weight: 700;
+                font-size: 0.95rem;
+                box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .game-message {
+                font-size: 1.15rem;
+                color: #3d3d3d;
+                margin: 24px 0;
+                min-height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 500;
+                font-family: 'Georgia', serif;
+                line-height: 1.6;
+                text-align: center;
+            }
+
+            .total-love-counter {
+                background: linear-gradient(135deg, #ffe6f7 0%, #ffd4f0 100%);
+                padding: 24px;
+                border-radius: 20px;
+                margin-bottom: 32px;
+                text-align: center;
+                box-shadow: 0 6px 20px rgba(255, 111, 168, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+                border: 2px solid rgba(255, 255, 255, 0.6);
+            }
+
+            .total-love-counter h3 {
+                font-size: 1.6rem;
+                color: #ff6fa8;
+                margin-bottom: 12px;
+                font-weight: 700;
+                text-shadow: 1px 2px 4px rgba(255, 111, 168, 0.2);
+            }
+
+            .total-love-counter p {
+                font-size: 1rem;
+                color: #3d3d3d;
+                margin: 0;
+                font-family: 'Georgia', serif;
+                line-height: 1.6;
+            }
+
+            .sync-status {
+                font-size: 0.85rem;
+                color: #7a7a7a;
+                margin-top: 12px;
+                font-style: italic;
+                opacity: 0.8;
+            }
+
+            .floating-item {
+                position: fixed;
+                font-size: 45px;
+                pointer-events: none;
+                animation: floatUp 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                z-index: 999;
+                box-shadow: 0 4px 8px rgba(255, 111, 168, 0.3);
+            }
+
+            @keyframes floatUp {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1) rotate(0deg);
+                }
+                50% {
+                    transform: translateY(-75px) scale(1.3) rotate(180deg);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-180px) scale(1.6) rotate(360deg);
+                }
+            }
+
+            .feed-buttons {
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                margin-top: 28px;
+                flex-wrap: wrap;
+            }
+
+            .feed-btn {
+                font-size: 40px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.95);
+                border: 3px solid rgba(255, 111, 168, 0.4);
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 4px 15px rgba(255, 111, 168, 0.2);
+            }
+
+            .feed-btn:hover {
+                transform: scale(1.15) rotate(-5deg);
+                background: rgba(255, 255, 255, 1);
+                border-color: rgba(255, 111, 168, 0.7);
+                box-shadow: 0 8px 25px rgba(255, 111, 168, 0.3);
+            }
+
+            .feed-btn:active {
+                transform: scale(0.95);
+            }
+
+            /* Haven/Letter Page Styles */
+            #havenPage {
+                padding: var(--space-24);
+            }
+
+            .letter-container {
+                background: rgba(255, 255, 255, 0.98);
+                padding: 48px;
+                border-radius: 24px;
+                box-shadow: 0 20px 60px rgba(255, 111, 168, 0.2), 0 10px 30px rgba(0, 0, 0, 0.1);
+                max-width: 750px;
+                width: 100%;
+                animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            @keyframes fadeIn {
+                from { 
+                    opacity: 0; 
+                    transform: scale(0.9) translateY(20px); 
+                }
+                to { 
+                    opacity: 1; 
+                    transform: scale(1) translateY(0); 
+                }
+            }
+
+            .letter-header {
+                text-align: center;
+                margin-bottom: 40px;
+                border-bottom: 3px solid rgba(255, 111, 168, 0.3);
+                padding-bottom: 24px;
+            }
+
+            .letter-title {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #ff6fa8;
+                margin-bottom: 12px;
+                text-shadow: 2px 3px 6px rgba(255, 111, 168, 0.2);
+            }
+
+            .letter-date {
+                font-size: 1rem;
+                color: #7a7a7a;
+                font-style: italic;
+                font-family: 'Georgia', serif;
+            }
+
+            .letter-content {
+                font-size: 1.05rem;
+                line-height: 2;
+                color: #3d3d3d;
+                margin-bottom: 32px;
+                text-align: left;
+                white-space: pre-line;
+                font-family: 'Georgia', serif;
+            }
+
+            .letter-footer {
+                text-align: right;
+                font-size: 1.05rem;
+                color: #3d3d3d;
+                font-weight: 500;
+                margin-top: 40px;
+                padding-top: 24px;
+                border-top: 3px solid rgba(255, 111, 168, 0.3);
+                font-family: 'Georgia', serif;
+            }
+
+            .letter-signature {
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: #ff6fa8;
+                margin-bottom: 12px;
+                text-shadow: 1px 2px 4px rgba(255, 111, 168, 0.2);
+            }
+
+            .back-btn {
+                margin-top: 32px;
+                background: linear-gradient(135deg, #c197f0 0%, #ff6fa8 100%);
+            }
+
+            .back-btn:hover {
+                background: linear-gradient(135deg, #b280e0 0%, #ff5b99 100%);
+            }
+
+
+
+            /* Love Notes Page Styles */
+            .love-notes-container {
+                max-width: 750px;
+                width: 100%;
+                padding: 24px;
+            }
+
+            .note-navigation {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 32px;
+                padding: 20px;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 20px;
+                box-shadow: 0 6px 20px rgba(255, 111, 168, 0.15);
+                border: 2px solid rgba(255, 255, 255, 0.6);
+            }
+
+            .nav-btn {
+                padding: 14px 28px;
+                font-size: 1rem;
+                font-weight: 600;
+                background: linear-gradient(135deg, #ff6fa8 0%, #ffb36b 100%);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                font-family: 'Georgia', serif;
+                box-shadow: 0 4px 15px rgba(255, 111, 168, 0.3);
+            }
+
+            .nav-btn:hover:not(:disabled) {
+                transform: translateY(-3px) scale(1.05);
+                box-shadow: 0 8px 25px rgba(255, 111, 168, 0.4);
+                background: linear-gradient(135deg, #ff5b99 0%, #ffa55a 100%);
+            }
+
+            .nav-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+            .note-counter {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #3d3d3d;
+                font-family: 'Georgia', serif;
+            }
+
+            .note-card {
+                display: none;
+                background: rgba(255, 255, 255, 0.98);
+                padding: 40px;
+                border-radius: 24px;
+                box-shadow: 0 15px 50px rgba(255, 111, 168, 0.2), 0 8px 25px rgba(0, 0, 0, 0.08);
+                animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .note-card.active {
+                display: block;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(30px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+            }
+
+            .note-title {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #ff6fa8;
+                margin-bottom: 32px;
+                text-align: center;
+                border-bottom: 3px solid rgba(255, 111, 168, 0.3);
+                padding-bottom: 20px;
+                text-shadow: 2px 3px 6px rgba(255, 111, 168, 0.2);
+            }
+
+            .note-content {
+                font-size: 1.05rem;
+                line-height: 2;
+                color: #3d3d3d;
+                text-align: left;
+                font-family: 'Georgia', serif;
+            }
+
+            .note-content p {
+                margin: 0 0 20px 0;
+            }
+
+            .note-content p:last-child {
+                margin-bottom: 0;
+            }
+
+            /* Promise Jar Styles */
+            .promise-container {
+                max-width: 820px;
+                width: 100%;
+                padding: 24px;
+            }
+
+            .jar-visual {
+                width: 220px;
+                margin: 0 auto 40px;
+                animation: fadeIn 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .jar-top {
+                width: 100%;
+                height: 35px;
+                background: linear-gradient(135deg, #c197f0 0%, #ff6fa8 100%);
+                border-radius: 16px 16px 0 0;
+                border: 3px solid rgba(255, 255, 255, 0.9);
+                border-bottom: none;
+                box-shadow: 0 4px 10px rgba(255, 111, 168, 0.2);
+            }
+
+            .jar-body {
+                width: 100%;
+                height: 280px;
+                background: rgba(255, 255, 255, 0.5);
+                border: 3px solid rgba(255, 255, 255, 0.9);
+                border-radius: 0 0 40px 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(255, 111, 168, 0.2);
+            }
+
+            .jar-body::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(180deg, rgba(255, 111, 168, 0.25) 0%, rgba(193, 151, 240, 0.25) 100%);
+                animation: jarShine 3.5s ease-in-out infinite;
+            }
+
+            @keyframes jarShine {
+                0%, 100% { 
+                    opacity: 0.4; 
+                    transform: scale(1);
+                }
+                50% { 
+                    opacity: 0.7;
+                    transform: scale(1.05);
+                }
+            }
+
+            .jar-label {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #ff6fa8;
+                text-align: center;
+                padding: 16px 20px;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 16px;
+                z-index: 1;
+                box-shadow: 0 4px 15px rgba(255, 111, 168, 0.2);
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .promises-list {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .promise-item {
+                background: rgba(255, 255, 255, 0.95);
+                padding: 24px;
+                border-radius: 20px;
+                box-shadow: 0 6px 20px rgba(255, 111, 168, 0.15), 0 3px 10px rgba(0, 0, 0, 0.05);
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                animation: slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+                border: 2px solid rgba(255, 255, 255, 0.6);
+            }
+
+            .promise-item:nth-child(1) { animation-delay: 0.1s; }
+            .promise-item:nth-child(2) { animation-delay: 0.2s; }
+            .promise-item:nth-child(3) { animation-delay: 0.3s; }
+            .promise-item:nth-child(4) { animation-delay: 0.4s; }
+            .promise-item:nth-child(5) { animation-delay: 0.5s; }
+            .promise-item:nth-child(6) { animation-delay: 0.6s; }
+            .promise-item:nth-child(7) { animation-delay: 0.7s; }
+            .promise-item:nth-child(8) { animation-delay: 0.8s; }
+
+            @keyframes slideInLeft {
+                from {
+                    opacity: 0;
+                    transform: translateX(-40px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+            }
+
+            .promise-item:hover {
+                transform: translateX(8px) scale(1.02);
+                box-shadow: 0 10px 30px rgba(255, 111, 168, 0.3), 0 5px 15px rgba(0, 0, 0, 0.08);
+            }
+
+            .promise-icon {
+                font-size: 35px;
+                flex-shrink: 0;
+            }
+
+            .promise-item p {
+                font-size: 1.05rem;
+                color: #3d3d3d;
+                line-height: 1.8;
+                margin: 0;
+                font-weight: 500;
+                font-family: 'Georgia', serif;
+            }
+
+            /* Questions Page Styles */
+            .questions-container {
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+                max-width: 820px;
+                width: 100%;
+                padding: 24px;
+            }
+
+            .question-card {
+                background: rgba(255, 255, 255, 0.98);
+                padding: 40px;
+                border-radius: 24px;
+                box-shadow: 0 10px 35px rgba(255, 111, 168, 0.2), 0 5px 15px rgba(0, 0, 0, 0.08);
+                animation: fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .question-card:nth-child(1) { animation-delay: 0.1s; }
+            .question-card:nth-child(2) { animation-delay: 0.2s; }
+            .question-card:nth-child(3) { animation-delay: 0.3s; }
+            .question-card:nth-child(4) { animation-delay: 0.4s; }
+
+            .question-header {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #c197f0;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                margin-bottom: 12px;
+            }
+
+            .question-text {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #3d3d3d;
+                margin-bottom: 28px;
+                line-height: 1.5;
+                font-family: 'Georgia', serif;
+            }
+
+            .answer-header {
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #ff6fa8;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                margin-bottom: 16px;
+                padding-top: 20px;
+                border-top: 2px solid rgba(255, 111, 168, 0.3);
+            }
+
+            .answer-text {
+                font-size: 1.05rem;
+                line-height: 2;
+                color: #3d3d3d;
+                font-style: italic;
+                font-family: 'Georgia', serif;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .title {
+                    font-size: 2rem;
+                }
+
+                .subtitle {
+                    font-size: 1rem;
+                }
+
+                .egg {
+                    width: 180px;
+                    height: 234px;
+                }
+
+                .game-container,
+                .letter-container,
+                .note-card,
+                .question-card {
+                    padding: 28px;
+                }
+
+                .letter-content {
+                    font-size: 1rem;
+                }
+
+                .btn {
+                    padding: 15px 30px;
+                    font-size: 1rem;
+                }
+
+                .buttons {
+                    gap: 14px;
+                }
+
+                .greeting-pop {
+                    font-size: 2.2rem;
+                }
+
+                .subtitle-fade {
+                    font-size: 1.05rem;
+                }
+
+                .nav-btn {
+                    padding: 12px 20px;
+                    font-size: 0.9rem;
+                }
+
+                .note-counter {
+                    font-size: 1rem;
+                }
+
+                .note-title {
+                    font-size: 1.8rem;
+                }
+
+                .note-content {
+                    font-size: 1rem;
+                }
+
+                .jar-visual {
+                    width: 180px;
+                }
+
+                .jar-body {
+                    height: 230px;
+                }
+
+                .promise-icon {
+                    font-size: 32px;
+                }
+
+                .promise-item p {
+                    font-size: 1rem;
+                }
+
+                .question-text {
+                    font-size: 1.25rem;
+                }
+
+                .answer-text {
+                    font-size: 1rem;
+                }
+
+                .page {
+                    padding: 24px 16px;
+                }
+
+                .game-egg {
+                    width: 150px;
+                    height: 195px;
+                }
+
+                .feed-btn {
+                    font-size: 35px;
+                    padding: 14px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Main Page -->
+        <div id="mainPage" class="page active">
+            <h1 class="title" id="mainTitle">Welcome, I'm Egg!💕</h1>
+            <p class="subtitle" id="mainSubtitle"></p>
+            <p id="eggHint" class="subtitle" style="margin-bottom:24px; color:#ff6fa8;font-style:italic;font-size:1.1rem;animation:pulse 2s ease-in-out infinite;">Tap to crack me open 🍿</p>
+            
+            <div class="egg-container">
+                <div class="egg" id="egg" onclick="crackEgg()">
+                    <div class="crack-lines">
+                        <div class="crack crack1"></div>
+                        <div class="crack crack2"></div>
+                        <div class="crack crack3"></div>
+                    </div>
+                    <div class="egg-face">
+                        <div class="egg-eyes">
+                            <div class="egg-eye"></div>
+                            <div class="egg-eye"></div>
+                        </div>
+                        <div class="egg-smile"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Choices Inline Panel (replaces sidebar) -->
+            <div class="choices-inline" id="choicesContainer" aria-hidden="true">
+                <h1 class="greeting-pop" id="greetingPop">Happy 1st Monthsary, Hon 🥚💕</h1>
+                <p class="subtitle-fade" id="subtitleFade">From your little egg, Janica — your Nica, always cracking for you.</p>
+                <div class="buttons" id="buttons">
+                    <button class="btn" onclick="goToAdventure(); closeSidebar();">🌈 Go on an Adventure</button>
+                    <button class="btn" onclick="goToHaven(); closeSidebar();">💌 Read My Love Letter</button>
+                    <button class="btn" onclick="goToLoveNotes(); closeSidebar();">💕 Sweet Love Notes</button>
+                    <button class="btn" onclick="goToPromises(); closeSidebar();">🌹 Our Promises</button>
+                    <button class="btn" onclick="goToQuestions(); closeSidebar();">💭 Know Me Better</button>
+                    <button class="btn" onclick="resetEgg();">⤺ Back to egg</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adventure Page -->
+        <div id="adventurePage" class="page">
+            <h1 class="title">🌈 Feed the Love Egg! 🌈</h1>
+            <div class="game-container">
+                <div class="total-love-counter">
+                    <h3>💕 Total Love Count: <span id="totalLoveCount">0</span> hearts</h3>
+                    <p>You and Doti have fed the egg together <strong><span id="totalLoveCount2">0</span></strong> times! 💕</p>
+                    <div class="sync-status" id="syncStatus">Syncing with Firebase...</div>
+                </div>
+                
+                <p class="subtitle">Click the items to feed the egg!</p>
+                
+                <div class="game-egg" id="gameEgg" onclick="feedEgg('tap')">
+                    <div class="game-egg-face">
+                        <div class="game-egg-eyes">
+                            <div class="game-egg-eye"></div>
+                            <div class="game-egg-eye"></div>
+                        </div>
+                        <div class="game-egg-smile"></div>
+                    </div>
+                </div>
+
+                <div class="feed-buttons">
+                    <button class="feed-btn" onclick="feedEgg('heart')" title="Feed heart">💖</button>
+                    <button class="feed-btn" onclick="feedEgg('star')" title="Feed star">⭐</button>
+                    <button class="feed-btn" onclick="feedEgg('flower')" title="Feed flower">🌸</button>
+                </div>
+
+                <div class="love-meter">
+                    <div class="love-meter-label">Love Meter</div>
+                    <div class="love-meter-bar">
+                        <div class="love-meter-fill" id="loveMeterFill">0%</div>
+                    </div>
+                </div>
+
+                <div class="game-message" id="gameMessage">Feed the egg to fill the love meter! 💕</div>
+            </div>
+
+            <button class="btn back-btn" onclick="goToMain()">Back to main 💕</button>
+        </div>
+
+
+
+        <!-- Love Notes Page -->
+        <div id="loveNotesPage" class="page">
+            <h1 class="title">💌 Love Notes from Nica 💌</h1>
+            <div class="love-notes-container">
+                <div class="note-navigation">
+                    <button class="nav-btn" onclick="previousNote()" id="prevBtn">← Previous</button>
+                    <span class="note-counter"><span id="currentNote">1</span> of 3</span>
+                    <button class="nav-btn" onclick="nextNote()" id="nextBtn">Next →</button>
+                </div>
+                
+                <div class="note-card active" data-note="0">
+                    <h2 class="note-title">💕 Right Now</h2>
+                    <div class="note-content">
+                        <p>Today marks one month with you, Hon. One whole month of choosing each other, of learning your world, of building something real. I want you to know—right now, in this moment—I love you. Not a future version of you. Not who you'll become. You, exactly as you are today.</p>
+                        <p>I see how hard you're working to be better, even on the days when everything feel heavy. And I'm working too. We're both trying, both showing up, and that means everything to me.</p>
+                        <p>Thank you for being here with me, for choosing me back.</p>
+                    </div>
+                </div>
+                
+                <div class="note-card" data-note="1">
+                    <h2 class="note-title">🌅 For Tomorrow</h2>
+                    <div class="note-content">
+                        <p>I don't know what the future holds, Hon. Some days will be easy, some will be really hard. We'll have good moments and difficult moments. The challenges and the darkness we are facing won't just disappear because we love each other. But here's what I know—I want you in all of it. I want tomorrow with you. Next month, next year, whenever 'later' becomes.</p>
+                        <p>I see a future where you're still creating beautiful things, still lost in books, still making amazing food. I see Luna with us. I see Azi growing up knowing how much we both love him. I see us learning each other more and more, supporting each other through everything. I don't need perfection. I just need you.</p>
+                        <p>So I'm making a choice right now—to build a future with you. Will you keep building it with me?</p>
+                    </div>
+                </div>
+                
+                <div class="note-card" data-note="2">
+                    <h2 class="note-title">💖 What I Intend</h2>
+                    <div class="note-content">
+                        <p>I want to be clear about what I'm committing to as your partner. I intend to show up for you, even when it's hard. I intend to support your passions—your art, your cooking, your dreams—even if I don't fully understand them. I intend to love Luna the way you do because she matters to you. I intend to treat Azi like he's my own, with the same care and commitment I give you.</p>
+                        <p>I intend to be honest with you, to be vulnerable, to let you see my struggles too. I intend to keep learning your world and asking questions because I want to understand you better. I intend to choose you on the good days and the bad days. I intend to be your comfort, your person, your safe place.</p>
+                        <p>I'm not perfect and I'll mess up sometimes, but I intend to keep trying, keep loving, keep choosing us. That's my promise to you, Dorothy, My Honey.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn back-btn" onclick="goToMain()">Back to main 💕</button>
+        </div>
+
+        <!-- Promise Jar Page -->
+        <div id="promisesPage" class="page">
+            <h1 class="title">🌹 Our Promise Jar 🌹</h1>
+            <div class="promise-container">
+                <div class="jar-visual">
+                    <div class="jar-top"></div>
+                    <div class="jar-body">
+                        <div class="jar-label">Promises for Doti 💕</div>
+                    </div>
+                </div>
+                
+                <div class="promises-list">
+                    <div class="promise-item">
+                        <span class="promise-icon">🏠</span>
+                        <p>I promise to be your safe place when the world feels too heavy</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">👨‍👩‍👧‍👦</span>
+                        <p>I promise to love Luna and Azi with the same fierce protection I give you</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">💪</span>
+                        <p>I promise to keep trying, even on the days when trying feels impossible</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">✨</span>
+                        <p>I promise to see the beauty in you that you sometimes can't see in yourself</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">🤝</span>
+                        <p>I promise to hold your hand through depression and dance with you in the light</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">💖</span>
+                        <p>I promise to choose you, every single day, without hesitation</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">🗣️</span>
+                        <p>I promise to be honest, vulnerable, and real with you always</p>
+                    </div>
+                    <div class="promise-item">
+                        <span class="promise-icon">🏡</span>
+                        <p>I promise to build a life with you where we both feel loved and valued</p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn back-btn" onclick="goToMain()">Back to main 💕</button>
+        </div>
+
+        <!-- Intimate Questions Page -->
+        <div id="questionsPage" class="page">
+            <h1 class="title">💭 Know Me Better 💭</h1>
+            <div class="questions-container">
+                <div class="question-card">
+                    <div class="question-header">Question for Nica:</div>
+                    <div class="question-text">What's your favorite memory of us so far?</div>
+                    <div class="answer-header">Nica's Answer:</div>
+                    <div class="answer-text">Every quiet moment with you—waking up knowing you're mine, making you smile, holding you when things get hard. But if I had to choose one, it's the moment you trusted me with your heart.</div>
+                </div>
+                
+                <div class="question-card">
+                    <div class="question-header">Question for Nica:</div>
+                    <div class="question-text">What do you love most about our relationship?</div>
+                    <div class="answer-header">Nica's Answer:</div>
+                    <div class="answer-text">That you see me—really see me—flaws and all, and you love me anyway. That we're building something real, not something perfect. That we're doing it together.</div>
+                </div>
+                
+                <div class="question-card">
+                    <div class="question-header">Question for Nica:</div>
+                    <div class="question-text">How do you want me to support you on hard days?</div>
+                    <div class="answer-header">Nica's Answer:</div>
+                    <div class="answer-text">Just be there. Hold me. Tell me you're not going anywhere. Sometimes I need words, sometimes I just need your presence. Thank you for asking, hon. That means everything.</div>
+                </div>
+                
+                <div class="question-card">
+                    <div class="question-header">Question for Nica:</div>
+                    <div class="question-text">What does forever look like to you?</div>
+                    <div class="answer-header">Nica's Answer:</div>
+                    <div class="answer-text">You, me, Luna, and Azi. Quiet mornings and lazy afternoons. Supporting each other through the hard days. Growing together. Building a life where we both feel safe and loved. That's my forever vision, Doti.</div>
+                </div>
+            </div>
+            <button class="btn back-btn" onclick="goToMain()">Back to main 💕</button>
+        </div>
+
+        <!-- Haven/Letter Page -->
+        <div id="havenPage" class="page">
+            <div class="letter-container">
+                <div class="letter-header">
+                    <div class="letter-title">💌 A Letter of Love 💌</div>
+                    <div class="letter-date">Happy 1st Monthsary</div>
+                </div>
+
+                <div class="letter-content" id="letterContent">
+    Hi Honey,
+
+    I know these days have been heavy for both of us. I see you struggling, and I know you see me struggling too. We're both carrying weight that sometimes feels impossible to carry, and that's okay. I want you to know that even on the days when everything feels dark and hopeless, I'm here. I'm doing my very best to be better—not just for you, but for us, for Luna, for Azi, and for myself. Some days I fail, and some days I barely make it, but I keep trying because you're worth it. We're worth it.
+
+    I love you, Doti. Not just on the good days when everything feels manageable. I love you on the days when depression makes you feel like a burden, when you think you're not enough, when you hate the parts of yourself that you think are broken or wrong. I love all of that. I love your flaws, your struggles, your pain—everything you think is negative about yourself, I see differently. I see someone who is brave enough to keep going despite everything. I see someone worthy of love and care and gentleness.
+
+    And I love Luna with all my heart. And Azi—he is my family too. He's yours, and because he's yours, he's mine. I treat him with the same love and commitment I give to you, because that's what family does. That's what we do.
+
+    I want the best for you, hon. Not a perfect life, not a perfect version of yourself, but the best version of what we can build together. A life where you feel safe, loved, and accepted exactly as you are right now. I'm working hard every single day to be that person for you, to be consistent, to show up even when it's hard, to be your comfort zone and your person.
+
+    You are not too much. You are not a burden. You are loved unconditionally—with all your beautiful flaws, all your struggles, all your darkness and light. I choose you, Doti. Every single day, I choose you. And I will keep choosing you.
+
+    I love you so much, hon. Happy 1st Monthsary. Here's to us, to our journey, and to getting better together.
+                </div>
+
+                <div class="letter-footer">
+                    <div class="letter-signature">With all my love,</div>
+                    <div>From Nica💕</div>
+                    <div>To Doti🌙</div>
+                </div>
+            </div>
+
+            <button class="btn back-btn" onclick="goToMain()">Back to main 💕</button>
+        </div>
+
+        <script>
+            // Firebase Configuration
+            // NOTE: This is a public test configuration. For a private version (only you and Doti),
+            // create your own Firebase project at https://console.firebase.google.com/
+            // Then replace this config with your own credentials.
+            const firebaseConfig = {
+                apiKey: "AIzaSyB-PLACEHOLDER",
+                authDomain: "egg-anniversary.firebaseapp.com",
+                databaseURL: "https://egg-anniversary-abc123-default-rtdb.firebaseio.com",
+                projectId: "egg-anniversary-abc123",
+                storageBucket: "egg-anniversary-abc123.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:abcdef123456"
+            };
+
+            // Initialize Firebase
+            let database = null;
+            let firebaseConnected = false;
+            
+            try {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                firebaseConnected = true;
+                console.log('Firebase initialized successfully');
+            } catch (error) {
+                console.log('Firebase initialization failed, using localStorage fallback:', error);
+                firebaseConnected = false;
+            }
+
+            // State management
+            let loveCount = 0;
+            let eggCracked = false;
+            let localSessionCount = 0; // Track this session's contributions
+
+            const items = {
+                heart: '💖',
+                star: '⭐',
+                flower: '🌸',
+                tap: '💕'
+            };
+
+            const messages = [
+                "The egg loves it! 💕",
+                "So much love! 🥰",
+                "You're so sweet! 💖",
+                "The egg is happy! 😊",
+                "More love please! ✨",
+                "You're amazing! 🌟",
+                "Keep going! 💗",
+                "The egg adores you! 🥚💕",
+                "So much joy! 🌈",
+                "Love overload! 💝"
+            ];
+
+            // Main page functions
+            function crackEgg() {
+                if (eggCracked) return;
+                
+                const egg = document.getElementById('egg');
+                const mainTitle = document.getElementById('mainTitle');
+                const mainSubtitle = document.getElementById('mainSubtitle');
+                
+                const mainPage = document.getElementById('mainPage');
+                
+                egg.classList.add('cracking');
+                // Hide hint text
+                let eggHint = document.getElementById('eggHint');
+                if (eggHint) eggHint.style.display = 'none';
+
+                setTimeout(() => {
+                    egg.classList.add('cracked');
+                    
+                    // Hide original title and subtitle
+                    mainTitle.style.display = 'none';
+                    mainSubtitle.style.display = 'none';
+                    
+                    // Add blur to the main page background
+                    mainPage.classList.add('blurred');
+                    
+                    // Open the inline choices panel
+                    setTimeout(() => {
+                        openSidebar();
+                    }, 300);
+                    
+                    eggCracked = true;
+                }, 500);
+            }
+
+            function resetEgg() {
+                const egg = document.getElementById('egg');
+                const mainTitle = document.getElementById('mainTitle');
+                const mainSubtitle = document.getElementById('mainSubtitle');
+                
+                const mainPage = document.getElementById('mainPage');
+                let eggHint = document.getElementById('eggHint');
+                
+                // Close sidebar if open
+                closeSidebar();
+                
+                // (no hamburger menu in this layout)
+                
+                // Remove blur from the main page
+                mainPage.classList.remove('blurred');
+                
+                // Wait for fade-in, then reset everything
+                setTimeout(() => {
+                    egg.classList.remove('cracking', 'cracked');
+                
+                    // Show original title, subtitle, hint
+                    mainTitle.style.display = 'block';
+                    mainSubtitle.style.display = 'block';
+                    if (eggHint) eggHint.style.display = 'block';
+        
+                    eggCracked = false;
+                }, 600);
+            }
+
+            // Firebase functions
+            function initializeFirebase() {
+                if (firebaseConnected && database) {
+                    const loveCountRef = database.ref('/egg-anniversary/loveCount');
+                    
+                    // Listen for real-time updates
+                    loveCountRef.on('value', (snapshot) => {
+                        const count = snapshot.val() || 0;
+                        loveCount = count;
+                        updateLoveDisplay();
+                        updateSyncStatus('✓ Synced with Firebase');
+                    }, (error) => {
+                        console.error('Firebase read error:', error);
+                        loadFromLocalStorage();
+                        updateSyncStatus('⚠ Using local storage');
+                    });
+                } else {
+                    loadFromLocalStorage();
+                    updateSyncStatus('⚠ Using local storage (offline mode)');
+                }
+            }
+
+            function saveLoveCount(count) {
+                if (firebaseConnected && database) {
+                    const loveCountRef = database.ref('/egg-anniversary/loveCount');
+                    loveCountRef.set(count).catch((error) => {
+                        console.error('Firebase write error:', error);
+                        saveToLocalStorage(count);
+                        updateSyncStatus('⚠ Saved locally only');
+                    });
+                } else {
+                    saveToLocalStorage(count);
+                }
+            }
+
+            // In-memory storage fallback (since localStorage is not available in sandboxed environment)
+            let inMemoryLoveCount = 0;
+
+            function loadFromLocalStorage() {
+                // Use in-memory storage as fallback
+                loveCount = inMemoryLoveCount;
+                updateLoveDisplay();
+            }
+
+            function saveToLocalStorage(count) {
+                // Store in memory instead of localStorage
+                inMemoryLoveCount = count;
+            }
+
+            function updateLoveDisplay() {
+                const totalLoveElements = document.querySelectorAll('#totalLoveCount, #totalLoveCount2');
+                totalLoveElements.forEach(el => {
+                    if (el) el.textContent = loveCount;
+                });
+                
+                // Update love meter
+                const maxLove = 50;
+                const percentage = Math.min((loveCount / maxLove) * 100, 100);
+                const fill = document.getElementById('loveMeterFill');
+                if (fill) {
+                    fill.style.width = percentage + '%';
+                    fill.textContent = Math.round(percentage) + '%';
+                }
+            }
+
+            function updateSyncStatus(message) {
+                const statusEl = document.getElementById('syncStatus');
+                if (statusEl) {
+                    statusEl.textContent = message;
+                }
+            }
+
+            // Choices panel functions (replaces sidebar behavior)
+            function openSidebar() {
+                const choicesContainer = document.getElementById('choicesContainer');
+                const greetingPop = document.getElementById('greetingPop');
+                const subtitleFade = document.getElementById('subtitleFade');
+                if (!choicesContainer) return;
+                choicesContainer.classList.add('show');
+                // Animate header and subtitle
+                setTimeout(() => {
+                    if (greetingPop) greetingPop.classList.add('show');
+                }, 150);
+                setTimeout(() => {
+                    if (subtitleFade) subtitleFade.classList.add('show');
+                }, 300);
+            }
+
+            function closeSidebar() {
+                const choicesContainer = document.getElementById('choicesContainer');
+                const greetingPop = document.getElementById('greetingPop');
+                const subtitleFade = document.getElementById('subtitleFade');
+                if (!choicesContainer) return;
+                // Hide header animations first
+                if (greetingPop) greetingPop.classList.remove('show');
+                if (subtitleFade) subtitleFade.classList.remove('show');
+                // Then hide the panel
+                setTimeout(() => {
+                    choicesContainer.classList.remove('show');
+                }, 220);
+            }
+
+            // Navigation functions
+            function showPage(pageId) {
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(pageId).classList.add('active');
+                
+                // Initialize Firebase when entering adventure page
+                if (pageId === 'adventurePage') {
+                    initializeFirebase();
+                }
+            }
+
+            function goToAdventure() {
+                showPage('adventurePage');
+            }
+
+            function goToHaven() {
+                showPage('havenPage');
+            }
+
+            function goToMain() {
+                showPage('mainPage');
+                // When navigating back to main from other pages, show the options panel
+                try {
+                    openSidebar();
+                } catch (e) {
+                    // fallback: ensure choices are visible
+                    const choices = document.getElementById('choicesContainer');
+                    if (choices) choices.classList.add('show');
+                }
+            }
+
+
+
+            function goToLoveNotes() {
+                showPage('loveNotesPage');
+                currentNoteIndex = 0;
+                showNote(0);
+            }
+
+            function goToPromises() {
+                showPage('promisesPage');
+            }
+
+            function goToQuestions() {
+                showPage('questionsPage');
+            }
+
+            // Love Notes Navigation
+            let currentNoteIndex = 0;
+            const totalNotes = 3;
+
+            function showNote(index) {
+                const notes = document.querySelectorAll('.note-card');
+                notes.forEach((note, i) => {
+                    note.classList.remove('active');
+                    if (i === index) {
+                        note.classList.add('active');
+                    }
+                });
+                
+                document.getElementById('currentNote').textContent = index + 1;
+                
+                // Update button states
+                document.getElementById('prevBtn').disabled = index === 0;
+                document.getElementById('nextBtn').disabled = index === totalNotes - 1;
+            }
+
+            function previousNote() {
+                if (currentNoteIndex > 0) {
+                    currentNoteIndex--;
+                    showNote(currentNoteIndex);
+                }
+            }
+
+            function nextNote() {
+                if (currentNoteIndex < totalNotes - 1) {
+                    currentNoteIndex++;
+                    showNote(currentNoteIndex);
+                }
+            }
+
+            // Game functions
+            function feedEgg(type) {
+                loveCount++;
+                localSessionCount++;
+                
+                // Save to Firebase (or localStorage fallback)
+                saveLoveCount(loveCount);
+                
+                // Update display
+                updateLoveDisplay();
+                
+                // Show floating item
+                createFloatingItem(items[type] || items.tap);
+                
+                // Update message
+                const messageEl = document.getElementById('gameMessage');
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                const maxLove = 50;
+                
+                if (localSessionCount === 1) {
+                    messageEl.textContent = `You fed the egg! ${randomMessage}`;
+                } else if (loveCount >= maxLove) {
+                    messageEl.textContent = `💝 LOVE METER FULL! ${loveCount} total feedings! The egg loves you SO MUCH! 💝`;
+                } else {
+                    messageEl.textContent = `You fed the egg ${localSessionCount} time${localSessionCount > 1 ? 's' : ''} this session! ${randomMessage}`;
+                }
+                
+                // Animate the egg
+                const gameEgg = document.getElementById('gameEgg');
+                gameEgg.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    gameEgg.style.transform = 'scale(1)';
+                }, 200);
+            }
+
+            function createFloatingItem(item) {
+                const floatingItem = document.createElement('div');
+                floatingItem.className = 'floating-item';
+                floatingItem.textContent = item;
+                
+                const gameEgg = document.getElementById('gameEgg');
+                const rect = gameEgg.getBoundingClientRect();
+                
+                floatingItem.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+                floatingItem.style.top = (rect.top + rect.height / 2 - 20) + 'px';
+                
+                document.body.appendChild(floatingItem);
+                
+                setTimeout(() => {
+                    floatingItem.remove();
+                }, 2000);
+            }
+        </script>
+    </body>
+    </html>
